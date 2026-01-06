@@ -110,7 +110,7 @@ namespace KP_KW_Generator
         private void TypBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string typ = ((ComboBoxItem)TypBox.SelectedItem).Content.ToString();
-            Title = typ == "KP" ? "Wypisywanie KP – Kasa Przyjmie" : "Wypisywanie KW – Kasa Wyda";
+            Title = typ == "KP" ? "KP – Kasa Przyjmie" : "KW – Kasa Wyda";
             Komu.Text = typ == "KP" ? "Od kogo?" : "Komu?";
         }
 

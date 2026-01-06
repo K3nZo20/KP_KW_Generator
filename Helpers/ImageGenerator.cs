@@ -11,11 +11,11 @@ namespace KP_KW_Generator.Helpers
     {
         public static void SaveWithTemplate(DocumentData d, string outputPath)
         {
-            const int dpi = 300;
+            const int dpi = 96;
 
-            // A4 portrait
-            int width = (int)(8.27 * dpi);
-            int height = (int)(11.69 * dpi);
+            // A4 w DIP
+            int width = (int)(8.27 * dpi);   // 794
+            int height = (int)(11.69 * dpi); // 1123
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string templatePath = Path.Combine(baseDir, "Templates", $"{d.Typ}_Template.png");
@@ -23,70 +23,69 @@ namespace KP_KW_Generator.Helpers
             var visual = new DrawingVisual();
             using (var dc = visual.RenderOpen())
             {
-                // Tło – odpowiednik PDF template
+                // Tło
                 var background = new BitmapImage(new Uri(templatePath));
                 dc.DrawImage(background, new Rect(0, 0, width, height));
 
                 Typeface font = new Typeface("Arial");
                 Brush brush = Brushes.Black;
 
-                //
-                // ——— POLA TAK JAK W PDF-GENERATOR ———
-                //
+                const float COPY_OFFSET_Y = -564f;
 
-                // Od kogo / Komu
-                DrawText(dc, d.OdKogo, 130, height - 700, 12, font, brush);
+                DrawCopy(0);
+                DrawCopy(COPY_OFFSET_Y);
 
-                // Data
-                DrawText(dc, d.Data.ToString("dd.MM.yyyy"), 275, height - 728, 12, font, brush);
-
-                //
-                // Pozycje
-                //
-                float startY = 667;
-                foreach (var p in d.Pozycje)
+                void DrawCopy(float offsetY)
                 {
-                    // opis
-                    DrawText(dc, p.Opis, 83, height - startY, 12, font, brush);
+                    DrawTextPdf(dc, d.OdKogo, 177, 950 + offsetY, 12);
+                    DrawTextPdf(dc, d.Data.ToString("dd.MM.yyyy"), 365, 985 + offsetY, 12);
 
-                    // kwota
-                    DrawText(dc, $"{p.Kwota:0.00}", 383, height - startY, 12, font, brush);
+                    float startY = 905 + offsetY;
+                    foreach (var p in d.Pozycje)
+                    {
+                        DrawTextPdf(dc, p.Opis, 111, startY, 12);
+                        DrawTextPdf(dc, $"{p.Kwota:0.00}", 510, startY, 12);
+                        startY -= 26;
+                    }
 
-                    startY -= 19;
+                    DrawTextPdf(dc, $"{d.Suma:0.00} zł", 492, 774 + offsetY, 12);
+                    DrawTextPdf(dc, d.Slownie, 167, 744 + offsetY, 9);
                 }
 
-                // Suma
-                DrawText(dc, $"{d.Suma:0.00} zł", 371, height - 572, 12, font, brush);
+                void DrawTextPdf(
+                    DrawingContext ctx,
+                    string text,
+                    double xPdf,
+                    double yPdf,
+                    double pdfFontPt)
+                {
+                    // PDF (0,0) = dół → WPF (0,0) = góra
+                    double yWpf = height - yPdf;
 
-                // Słownie
-                DrawText(dc, d.Slownie, 125, height - 551, 9, font, brush);
+                    double fontDip = pdfFontPt * 96.0 / 72.0;
+
+                    var formatted = new FormattedText(
+                        text,
+                        System.Globalization.CultureInfo.GetCultureInfo("pl-PL"),
+                        FlowDirection.LeftToRight,
+                        font,
+                        fontDip,
+                        brush,
+                        1.0);
+
+                    ctx.DrawText(formatted, new Point(xPdf, yWpf));
+                }
             }
 
-            // Render
             var bitmap = new RenderTargetBitmap(width, height, dpi, dpi, PixelFormats.Pbgra32);
             bitmap.Render(visual);
 
-            // Zapis PNG
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bitmap));
 
-            using (var fs = new FileStream(outputPath, FileMode.Create))
-                encoder.Save(fs);
-        }
-
-        private static void DrawText(DrawingContext dc, string text, double x, double y,
-            int size, Typeface font, Brush brush)
-        {
-            var formatted = new FormattedText(
-                text,
-                System.Globalization.CultureInfo.GetCultureInfo("pl-PL"),
-                FlowDirection.LeftToRight,
-                font,
-                size,
-                brush,
-                1.0);
-
-            dc.DrawText(formatted, new Point(x, y));
+            using var fs = new FileStream(outputPath, FileMode.Create);
+            encoder.Save(fs);
         }
     }
 }
+//By Jędrzej Kantor
