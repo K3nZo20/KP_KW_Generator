@@ -56,6 +56,11 @@
 
         <!-- Przyciski -->
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,210,0">
+                <RadioButton x:Name="RbPojedyncze" Content="Pojedyncze" GroupName="Tryb" IsChecked="True" Margin="0,0,10,0"/>
+                <RadioButton x:Name="RbPodwojne" Content="Podwójne" GroupName="Tryb"/>
+            </StackPanel>
+            <Button Content="Wyczyść" Width="120" Click="Wyczysc_Click" Margin="0,0,10,0"/>
             <Button Content="Generuj PDF" Width="120" Click="GenerujPDF_Click" Margin="0,0,10,0"/>
             <Button Content="Drukuj" Width="120" Click="Drukuj_Click"/>
         </StackPanel>

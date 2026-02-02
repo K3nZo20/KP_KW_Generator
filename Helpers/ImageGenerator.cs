@@ -19,11 +19,18 @@ namespace KP_KW_Generator.Helpers
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string templatePath = Path.Combine(baseDir, "Templates", $"{d.Typ}_Template.png");
+            if (d.Pojedyncze)
+            {
+                templatePath = Path.Combine(baseDir, "Templates", $"{d.Typ}_Template_Solo.png");
+            }
 
-            var visual = new DrawingVisual();
+
+
+                var visual = new DrawingVisual();
             using (var dc = visual.RenderOpen())
             {
                 // Tło
+
                 var background = new BitmapImage(new Uri(templatePath));
                 dc.DrawImage(background, new Rect(0, 0, width, height));
 
@@ -33,7 +40,11 @@ namespace KP_KW_Generator.Helpers
                 const float COPY_OFFSET_Y = -564f;
 
                 DrawCopy(0);
-                DrawCopy(COPY_OFFSET_Y);
+                if (!d.Pojedyncze)
+                {
+                    DrawCopy(COPY_OFFSET_Y);
+                }
+                
 
                 void DrawCopy(float offsetY)
                 {

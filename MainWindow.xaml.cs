@@ -69,7 +69,8 @@ namespace KP_KW_Generator
                 Typ = ((ComboBoxItem)TypBox.SelectedItem).Content.ToString() ?? "KP",
                 Data = DataPicker.SelectedDate ?? DateTime.Today,
                 OdKogo = OdKogoBox.Text,
-                Pozycje = pozycje.ToList()
+                Pozycje = pozycje.ToList(),
+                Pojedyncze = RbPojedyncze.IsChecked == true
             };
         }
 
@@ -81,6 +82,15 @@ namespace KP_KW_Generator
             string path = Path.Combine(desktopPath, fileName);
             PdfGenerator.SaveWithTemplate(data, path);
             MessageBox.Show($"PDF wygenerowany: {path}");
+        }
+
+        private void Wyczysc_Click(object sender, RoutedEventArgs e)
+        {
+            OdKogoBox.Text = "";
+            DataPicker.Text = "";
+            DataPicker.SelectedDate = DateTime.Today;
+            pozycje.Clear();
+
         }
 
         private void Drukuj_Click(object sender, RoutedEventArgs e)
@@ -112,6 +122,14 @@ namespace KP_KW_Generator
             string typ = ((ComboBoxItem)TypBox.SelectedItem).Content.ToString();
             Title = typ == "KP" ? "KP – Kasa Przyjmie" : "KW – Kasa Wyda";
             Komu.Text = typ == "KP" ? "Od kogo?" : "Komu?";
+            if (typ == "KP")
+            {
+                RbPodwojne.IsChecked = true;
+            }
+            else
+            {
+                RbPojedyncze.IsChecked = true;
+            }
         }
 
         private void AktualizujMozliwoscDodaniaWiersza()

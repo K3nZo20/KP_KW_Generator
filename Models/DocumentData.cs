@@ -13,6 +13,7 @@ namespace KP_KW_Generator.Models
         public List<Pozycja> Pozycje { get; set; } = new List<Pozycja>();
         public decimal Suma => Pozycje?.Sum(p => p.Kwota) ?? decimal.Zero;
         public string Slownie => Helpers.NumberToWords.KwotaSlownie(Suma);
+        public bool Pojedyncze {  get; set; }
     }
 
     public class Pozycja : INotifyPropertyChanged
